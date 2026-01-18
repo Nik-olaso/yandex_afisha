@@ -27,7 +27,7 @@ def start(request):
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', start),
-]
+] 
 
 if settings.DEBUG:
     urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

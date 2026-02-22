@@ -1,5 +1,6 @@
 from django.db import models
 
+
 class Place(models.Model):
     title = models.CharField(max_length=200)
     description_short = models.TextField('Короткое описание')
@@ -19,8 +20,9 @@ class Image(models.Model):
         verbose_name='Место'
     )
     image = models.ImageField(
-        'Изображение',
-        upload_to='places/'
+        'Картинки',
+        null=True,
+        blank=True,
     )
     position = models.PositiveIntegerField(
         'Позиция',

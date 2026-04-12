@@ -125,7 +125,6 @@
     });
     map.addControl(sidebar);
 
-    // FIXME should be hidden in production mode
     L.control.custom({
       position: 'bottomleft',
       content: `
@@ -148,85 +147,60 @@
       }
     }).addTo(map);
 
-    function loadJSON(elementId){
-      let element = document.getElementById(elementId);
 
-      if (!element){
-        log.error(`Not found element with id '${elementId}'.`)
-        return null;
-      }
-
-      return JSON.parse(element.textContent);
-    }
-
-  async function loadPlacesFromAPI() {
-    try {
-      let response = await fetch('/where_to_go/');
-      if (!response.ok) {
-        throw new Error('Failed to load places');
-      }
-      let places = await response.json();
-      log.debug('Load GeoJSON for places', places);
-      return places;
-    } catch (error) {
-      log.error('Error loading places:', error);
-      return {
-        "type": "FeatureCollection",
-        "features": []
-      };
-    }
+function loadJSON(elementId){
+  let element = document.getElementById(elementId);
+  if (!element){
+    log.error(`Not found element with id '${elementId}'.`)
+    return null;
   }
-  async function initMap() {
-    let places = await loadPlacesFromAPI();
-    log.debug('Load GeoJSON for places', places);
+  return JSON.parse(element.textContent);
+}
 
+async function initMap() {
+  let places = loadJSON('places-geojson');
+  log.debug('Load GeoJSON for places', places);
 
-    L.geoJSON(places, {
-        pointToLayer: function(geoJsonPoint, latlng) {
-          if (geoJsonPoint.geometry.type != "Point"){
-            return
-          }
-
-          let color = geoJsonPoint.properties.color || 'red';
-
-          var pulsingIcon = L.icon.pulse({
-            iconSize: [12, 12],
-            color: color,
-            fillColor: color,
-            heartbeat: 2.5,
-          });
-
-          let marker = L.marker(latlng, {
-            icon: pulsingIcon,
-            riseOnHover: true,
-          });
-
-          marker.bindTooltip(geoJsonPoint.properties.title);
-          marker.bindPopup(function (layer) {
-            return geoJsonPoint.properties.title;
-          })
-
-          marker.on('click', function(event){
-            log.debug('Feature selected', geoJsonPoint);
-            sidebar.show();
-            loadPlaceInfo(geoJsonPoint.properties.placeId, geoJsonPoint.properties.detailsUrl);
-          });
-          return marker;
+  L.geoJSON(places, {
+      pointToLayer: function(geoJsonPoint, latlng) {
+        if (geoJsonPoint.geometry.type != "Point"){
+          return
         }
-    }).addTo(map);
-  }
-    initMap()
+
+        let color = geoJsonPoint.properties.color || 'red';
+        var pulsingIcon = L.icon.pulse({
+          iconSize: [12, 12],
+          color: color,
+          fillColor: color,
+          heartbeat: 2.5,
+        });
+
+        let marker = L.marker(latlng, {
+          icon: pulsingIcon,
+          riseOnHover: true,
+        });
+
+        marker.bindTooltip(geoJsonPoint.properties.title);
+        marker.bindPopup(function (layer) {
+          return geoJsonPoint.properties.title;
+        })
+
+        marker.on('click', function(event){
+          log.debug('Feature selected', geoJsonPoint);
+          sidebar.show();
+          loadPlaceInfo(geoJsonPoint.properties.placeId, geoJsonPoint.properties.detailsUrl);
+        });
+        return marker;
+      }
+  }).addTo(map);
+}
+
     var sidebarApp = new Vue({
       el: '#sidebar-app',
       template: document.getElementById('app-template').innerHTML,
       data: {
         loadingPlaceId: null,
-        selectedPlace: null,  // object with attributes specified below
-          // title
-          // placeId
-          // imgs
-          // short_description
-          // long_description
+        selectedPlace: null,  
       },
       computed: {
         promptVisible: function () {
@@ -250,15 +224,12 @@
       },
       updated: function () {
         this.$nextTick(function () {
-          // Код, будет запущен только после обновления всех представлений
-          $('#places-photos').carousel();
+          $('#place-photos').carousel();
         })
       },
       methods: {
         handlePhotosClick: function(slideId='next') {
-          // default event handlers of Bootstrap Carousel conflict with Leaflet
-          // so custom handler will mimic expected carousel behaviour
-          $('#places-photos').carousel(slideId);
+          $('#place-photos').carousel(slideId);
         }
       },
     });
@@ -268,38 +239,37 @@
       sidebarApp.loadingPlaceId = null;
     })
 
-    async function loadPlaceInfo(placeId, detailsUrl){
-      let apiUrl = `/places/${placeId}/`; 
-      
-      sidebarApp.selectedPlace = null;
-      sidebarApp.loadingPlaceId = placeId;
+  async function loadPlaceInfo(placeId, detailsUrl){
+  sidebarApp.selectedPlace = null;
+  sidebarApp.loadingPlaceId = placeId;
 
-      try {
-        let response = await fetch(apiUrl);
+  try {
+    let response = await fetch(detailsUrl);   
 
-        if (!response.ok){
-          return;
-        }
-
-        let data = await response.json();
-
-        if (sidebarApp.loadingPlaceId != placeId){
-          return
-        }
-
-        sidebarApp.selectedPlace = {
-          title: data.title,
-          placeId: placeId,
-          imgs: data.imgs || [],
-          short_description: data.description_short,
-          long_description: data.description_long,
-        };
-      } finally {
-        if (sidebarApp.loadingPlaceId == placeId){
-          sidebarApp.loadingPlaceId = null;
-        }
-      }
+    if (!response.ok){
+      return;
     }
+
+    let data = await response.json();
+
+    if (sidebarApp.loadingPlaceId != placeId){
+      return;
+    }
+
+    sidebarApp.selectedPlace = {
+      title: data.title,
+      placeId: placeId,
+      imgs: data.imgs || [],
+      short_description: data.description_short,
+      long_description: data.description_long,
+    };
+  } finally {
+    if (sidebarApp.loadingPlaceId == placeId){
+      sidebarApp.loadingPlaceId = null;
+    }
+  }
+}
+initMap();
   </script>
 </body>
 </html>

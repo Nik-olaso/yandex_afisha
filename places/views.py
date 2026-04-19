@@ -4,7 +4,6 @@ from django.http import JsonResponse
 
 
 def index(request):
-    """Главная страница, которая отдает все места из БД в формате GeoJSON."""
     places = Place.objects.all()
     features = []
     for place in places:
@@ -30,7 +29,6 @@ def index(request):
 
 
 def place_detail(request, place_id):
-    """Возвращает детальную информацию об одном месте в формате JSON."""
     place = get_object_or_404(Place, id=place_id)
 
     all_images = place.images.all().order_by('position')

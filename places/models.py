@@ -2,11 +2,15 @@ from django.db import models
 from tinymce.models import HTMLField
 
 class Place(models.Model):
-    title = models.CharField(max_length=200)
+    title = models.CharField('Название', max_length=200)
     description_short = models.TextField('Короткое описание')
     description_long = HTMLField('Полное описание')
     lng = models.FloatField('Долгота')
     lat = models.FloatField('Широта')
+
+    class Meta:
+        verbose_name = 'Место'
+        verbose_name_plural = 'Места'
 
     def __str__(self):
         return self.title
@@ -20,7 +24,7 @@ class Image(models.Model):
         verbose_name='Место'
     )
     image = models.ImageField(
-        'Картинки',
+        'Картинка',
         null=True,
         blank=True,
     )
@@ -31,6 +35,8 @@ class Image(models.Model):
     )
 
     class Meta:
+        verbose_name = 'Фотография'
+        verbose_name_plural = 'Фотографии'
         ordering = ['position']
 
     def __str__(self):

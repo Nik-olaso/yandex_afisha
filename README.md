@@ -101,14 +101,13 @@ python manage.py load_place [аргументы]
 Пример аргументов:
   1. `url`
     Импорт данных о месте по ссылке на JSON-файл.
-    ```
-      python manage.py load_place https://example.com/place.json
-    ```
+
+    python manage.py load_place https://example.com/place.json
+    
   2. `path`
     Импорт данных о месте из локального JSON-файла
-    ```
-      python manage.py load_place --path ./data/place.json
-    ```
+
+    python manage.py load_place ./data/place.json
 
 ## Используемые библиотеки
 

@@ -22,7 +22,7 @@ class PlaceAdmin(SortableAdminBase, admin.ModelAdmin):
     list_display = ['title', 'images_count']
     list_filter = ['title']
     search_fields = ['title']
-    fields = ['title', 'description_short', 'description_long', 'lat', 'lng']
+    fields = ['title', 'short_description', 'long_description', 'lat', 'lng']
     inlines = [ImageInline]
     
     def images_count(self, obj):

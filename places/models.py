@@ -24,9 +24,7 @@ class Image(models.Model):
         verbose_name='Место'
     )
     image = models.ImageField(
-        'Картинка',
-        null=True,
-        blank=True,
+        'Картинка'
     )
     position = models.PositiveIntegerField(
         'Позиция',

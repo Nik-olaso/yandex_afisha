@@ -27,8 +27,9 @@ class Command(BaseCommand):
         for index, img_url in enumerate(payload.get('imgs', [])):
             img_response = requests.get(img_url)
             img_response.raise_for_status()
-            Image.objects.create(
-                place=place,
-                position=index,
-                image=ContentFile(img_response.content, name=f"{place.title}_{index}.jpg")
-            )
+            if created:
+                Image.objects.create(
+                    place=place,
+                    position=index,
+                    image=ContentFile(img_response.content, name=f"{place.title}_{index}.jpg")
+                )

@@ -1,6 +1,7 @@
 from django.shortcuts import render, get_object_or_404
 from .models import Place
 from django.http import JsonResponse
+from django.urls import reverse
 
 
 def index(request):
@@ -16,7 +17,7 @@ def index(request):
             "properties": {
                 "title": place.title,
                 "placeId": place.id,
-                "detailsUrl": f"/places/{place.id}/",
+                "detailsUrl": reverse('place_detail', args=[place.id]), 
             }
         })
 

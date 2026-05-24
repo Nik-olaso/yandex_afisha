@@ -1,7 +1,7 @@
 import requests
 from django.core.management.base import BaseCommand
 from django.core.files.base import ContentFile
-from places.models import Place, Image # Твои названия моделей
+from places.models import Place, Image
 
 class Command(BaseCommand):
     help = 'Загружает данные о месте из JSON по URL'

@@ -30,10 +30,8 @@ def index(request):
 
 
 def place_detail(request, place_id):
-    place = get_object_or_404(Place, id=place_id)
-
-    all_images = place.images.all().order_by('position')
-    image_urls = [img.image.url for img in all_images]
+    place = get_object_or_404(Place.objects.prefetch_related('images'), id=place_id)
+    image_urls = [img.image.url for img in place.images.all()]
 
     response_data = {
         "title": place.title,
